@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --primary: #2563eb;
+  --secondary: #64748b;
+  --accent: #f59e0b;
+  --success: #22c55e;
+  --warning: #f97316;
+  --error: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1e1e1e;
+    --foreground: #ffffff;
+    --primary: #3b82f6;
+    --secondary: #94a3b8;
+    --accent: #fbbf24;
+    --success: #4ade80;
+    --warning: #fb923c;
+    --error: #f87171;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  /*------------------------------Text Styles-----------------------------------------*/
+  .h1-text {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold;
+  }
+  .h2-text {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+  }
+  .h3-text {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold;
+  }
+  .h4-text {
+    @apply text-lg md:text-xl lg:text-2xl font-semibold;
+  }
+  .h5-text {
+    @apply text-base md:text-lg lg:text-xl font-semibold;
+  }
+  .h6-text {
+    @apply text-sm md:text-base lg:text-lg font-semibold;
+  }
+  .p-text {
+    @apply text-base md:text-lg lg:text-xl;
+  }
+  .small-text {
+    @apply text-sm md:text-base lg:text-lg;
+  }
+  /*------------------------------------------------------------------------------------*/
+}
