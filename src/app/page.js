@@ -1,3 +1,7 @@
 export default function Home() {
-  return <>{/* Hero Section */}</>;
+  return (
+    <>
+      <h1 className="bg-black text-white">Hi</h1>
+    </>
+  );
 }
