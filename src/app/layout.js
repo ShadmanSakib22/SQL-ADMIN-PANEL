@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
-import { ThemeProvider } from "@/components/ThemeProvider";
+
 import "./globals.css";
+import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 const poppins = Poppins({
@@ -16,13 +17,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head />
+
       <body className={`${poppins.variable} antialiased box-border`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <div className="min-h-screen">{children}</div>
-          <Footer />
-        </ThemeProvider>
+        <Navbar />
+        <div className="min-h-screen">{children}</div>
+        <Footer />
       </body>
     </html>
   );
