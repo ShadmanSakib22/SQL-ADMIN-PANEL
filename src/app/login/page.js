@@ -4,19 +4,11 @@ import Image from "next/image";
 const page = () => {
   return (
     <>
-      <div className="flex flex-row h-screen">
-        <div className="my-[5rem] container min-w-[330px] max-w-[380px] mx-auto ">
+      <div className="container flex flex-col lg:flex-row mx-auto items-center gap-8 mt-[5rem]">
+        <Image src="/login.jpg" alt="login" width={720} height={720} priority />
+        <div className="w-full max-w-lg mx-auto">
           <LoginForm />
         </div>
-        <figure className="hidden md:block relative md:w-2/3 h-full bg-[#f9e1b3] border-l-4 border-double overflow-hidden">
-          <Image
-            src="/login.jpg"
-            alt="login"
-            fill
-            priority
-            className="object-contain object-center max-h-[600px] max-w-[600px] mx-auto"
-          />
-        </figure>
       </div>
     </>
   );
