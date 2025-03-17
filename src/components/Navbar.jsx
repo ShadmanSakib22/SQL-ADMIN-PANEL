@@ -9,13 +9,13 @@ export function Navbar() {
 
       <div className="flex gap-2 md:gap-4">
         <Link
-          href={"/signup"}
+          href={"/page/signup"}
           className="px-4 py-2 min-w-[92px] text-center rounded-md bg-[#fbe5b9] text-[#412413] hover:bg-[#f8d88d] transition-colors"
         >
           Register
         </Link>
         <Link
-          href={"/login"}
+          href={"/page/login"}
           className="px-4 py-2 min-w-[92px] text-center rounded-md border border-[#fbe5b9] hover:bg-[#523016] transition-colors"
         >
           Login
