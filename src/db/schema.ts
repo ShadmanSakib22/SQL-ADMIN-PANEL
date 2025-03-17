@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, SQL } from "drizzle-orm";
 import { sqliteTable, text, integer, check } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable(
@@ -22,3 +22,11 @@ export const users = sqliteTable(
 
 export type InsertUser = typeof users.$inferInsert;
 export type SelectUser = typeof users.$inferSelect;
+export type UserUpdate = {
+  name?: string;
+  email?: string;
+  password?: string;
+  lastLoginTime?: Date | SQL;
+  lastActivityTime?: Date | SQL;
+  status?: "active" | "blocked";
+};

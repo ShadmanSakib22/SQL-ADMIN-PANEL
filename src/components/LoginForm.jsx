@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +18,39 @@ import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: "/",
+    });
+
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      window.location.href = "/";
+    }
+
+    setLoading(false);
+  };
+
+  const preventSpace = (e) => {
+    if (e.key === " ") {
+      e.preventDefault();
+    }
+  };
 
   return (
-    <Card className=" mx-auto">
+    <Card className="mx-auto">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Login</CardTitle>
         <CardDescription>
@@ -27,13 +58,16 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={handleSubmit}>
+          {error && <div className="mb-4 text-sm text-red-500">{error}</div>}
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
                 required
               />
@@ -52,6 +86,9 @@ export function LoginForm() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={preventSpace}
                   required
                 />
                 <Button
@@ -70,10 +107,14 @@ export function LoginForm() {
               </div>
             </div>
           </div>
+          <div className="mt-4">
+            <Button className="w-full" type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
+            </Button>
+          </div>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
-        <Button className="w-full">Login</Button>
         <div className="text-center text-sm">
           Don't have an account?{" "}
           <Link href="/page/signup" className="text-primary hover:underline">

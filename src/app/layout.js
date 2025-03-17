@@ -1,5 +1,5 @@
 import { Poppins } from "next/font/google";
-
+import Providers from "@/components/Providers";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -21,9 +21,11 @@ export default function RootLayout({ children }) {
       <head />
 
       <body className={`${poppins.variable} antialiased box-border`}>
-        <Navbar />
-        <div className="min-h-screen">{children}</div>
-        <Footer />
+        <Providers>
+          <Navbar />
+          <div className="min-h-screen">{children}</div>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
