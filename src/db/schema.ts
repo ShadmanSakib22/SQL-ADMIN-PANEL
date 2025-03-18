@@ -8,11 +8,11 @@ export const users = sqliteTable(
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     password: text("password").notNull(),
-    registrationTime: integer("registration_time", {
-      mode: "timestamp",
-    }).default(sql`(CURRENT_TIMESTAMP)`),
-    lastLoginTime: integer("last_login_time", { mode: "timestamp" }),
-    lastActivityTime: integer("last_activity_time", { mode: "timestamp" }),
+    registrationTime: text("registration_time").default(
+      sql`(CURRENT_TIMESTAMP)`
+    ),
+    lastLoginTime: text("last_login_time"),
+    lastActivityTime: text("last_activity_time"),
     status: text("status", { enum: ["active", "blocked"] }).default("active"),
   },
   (table) => [
@@ -26,7 +26,7 @@ export type UserUpdate = {
   name?: string;
   email?: string;
   password?: string;
-  lastLoginTime?: Date | SQL;
-  lastActivityTime?: Date | SQL;
+  lastLoginTime?: string | SQL;
+  lastActivityTime?: string | SQL;
   status?: "active" | "blocked";
 };
