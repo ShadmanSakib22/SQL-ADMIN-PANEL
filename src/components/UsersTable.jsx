@@ -38,6 +38,8 @@ import {
   Trash,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 // Mock data for static display
 const mockUsers = [
@@ -47,6 +49,9 @@ const mockUsers = [
     email: "john@example.com",
     status: "active",
     lastLoginTime: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+    registrationTime: new Date(
+      Date.now() - 1000 * 60 * 60 * 24 * 7
+    ).toISOString(), // 7 days ago
   },
   {
     id: 2,
@@ -54,6 +59,9 @@ const mockUsers = [
     email: "jane@example.com",
     status: "active",
     lastLoginTime: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+    registrationTime: new Date(
+      Date.now() - 1000 * 60 * 60 * 24 * 7
+    ).toISOString(), // 7 days ago
   },
   {
     id: 3,
@@ -61,6 +69,9 @@ const mockUsers = [
     email: "bob@example.com",
     status: "blocked",
     lastLoginTime: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), // 3 days ago
+    registrationTime: new Date(
+      Date.now() - 1000 * 60 * 60 * 24 * 7
+    ).toISOString(), // 7 days ago
   },
   {
     id: 4,
@@ -68,6 +79,9 @@ const mockUsers = [
     email: "alice@example.com",
     status: "active",
     lastLoginTime: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // 10 minutes ago
+    registrationTime: new Date(
+      Date.now() - 1000 * 60 * 60 * 24 * 7
+    ).toISOString(), // 7 days ago
   },
   {
     id: 5,
@@ -75,10 +89,19 @@ const mockUsers = [
     email: "charlie@example.com",
     status: "active",
     lastLoginTime: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+    registrationTime: new Date(
+      Date.now() - 1000 * 60 * 60 * 24 * 7
+    ).toISOString(), // 7 days ago
   },
 ];
 
-// Format time since last login - move to lib/utils
+// Formats date and time based on locale - move to lib/table-utils
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString();
+};
+
+// Format time since last login - move to lib/table-utils
 const formatTimeSince = (dateString) => {
   const date = new Date(dateString);
   const now = new Date();
@@ -207,8 +230,40 @@ const UsersTable = () => {
             ) : null}
           </div>
         ),
-        cell: ({ row }) => formatTimeSince(row.getValue("lastLoginTime")),
+        cell: ({ row }) => {
+          const loginTime = row.getValue("lastLoginTime");
+          const formattedTime = formatTimeSince(loginTime);
+          const exactTime = formatDateTime(loginTime);
+
+          return (
+            <div
+              data-tooltip-id={`login-time-${row.id}`}
+              data-tooltip-content={exactTime}
+            >
+              {formattedTime}
+              <Tooltip id={`login-time-${row.id}`} />
+            </div>
+          );
+        },
         minWidth: 120,
+        enableSorting: true,
+      },
+      {
+        accessorKey: "registrationTime",
+        header: ({ column }) => (
+          <div
+            className="flex items-center gap-1 cursor-pointer select-none"
+            onClick={column.getToggleSortingHandler()}
+          >
+            Registration Time
+            {column.getIsSorted() === "asc" ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : column.getIsSorted() === "desc" ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : null}
+          </div>
+        ),
+        minWidth: 200,
         enableSorting: true,
       },
     ],
