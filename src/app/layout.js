@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import Providers from "@/components/Providers";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
           <div className="min-h-screen">{children}</div>
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );

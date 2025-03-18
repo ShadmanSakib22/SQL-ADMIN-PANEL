@@ -178,7 +178,7 @@ export function RegistrationForm() {
       <CardFooter className="flex flex-col space-y-4">
         <div className="text-center text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/page/login" className="text-primary hover:underline">
             Login
           </Link>
         </div>
