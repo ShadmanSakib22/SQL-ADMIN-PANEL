@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import UsersTable from "@/components/UsersTable";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -10,12 +11,13 @@ export default async function Home() {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
-        <h3 className="text-2xl font-bold mb-4">
-          Welcome, {session.user.name} to the SQL Admin Panel
+      <div className="container mx-auto py-[5rem]">
+        <h3 className="text-2xl font-bold mb-[2rem]">
+          Welcome, {session.user.name}!
         </h3>
-        {/* Table */}
-        {/* Pagination */}
+        <div className="bg-white border-4 border-double border-gray-200 shadow-md rounded-lg p-4 lg:p-8">
+          <UsersTable />
+        </div>
       </div>
     </>
   );
