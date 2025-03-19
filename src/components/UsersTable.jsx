@@ -49,34 +49,34 @@ import {
   unblockUsers,
   deleteUsers,
 } from "@/app/actions/userActions";
+import { checkUserStatus } from "@/app/actions/checkUserStatus";
+import { signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'blocked'
   const [reload, setReload] = useState(false);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Check Func before Block/Unblock/Delete
+  const secureAuth = async () => {
+    const status = await checkUserStatus();
+    if (status.status === "blocked" || status.status === "userNotFound") {
+      signOut();
+      redirect("/page/login");
+    }
+  };
 
   // Fetch User Data
   useEffect(() => {
     const loadUsers = async () => {
       setLoading(true);
       try {
-        const { pageIndex, pageSize } = pagination;
-        const offset = pageIndex * pageSize;
-        const { users: fetchedUsers, totalCount } = await fetchUsers(
-          pageSize,
-          offset
-        );
+        const { users: fetchedUsers } = await fetchUsers();
         setUsers(fetchedUsers);
-        setTotalCount(totalCount);
       } catch (error) {
         console.error("Failed to fetch users:", error);
       } finally {
@@ -85,54 +85,55 @@ const UsersTable = () => {
     };
 
     loadUsers();
-  }, [pagination, statusFilter, reload]); // Re-fetch when pagination or status filter changes
+  }, [reload]);
 
+  // Manual Table Reload Button
   const handleReload = () => {
     setReload((prev) => !prev);
   };
 
-  // Server Action Handlers
+  // Server Action Handlers (using IDs)
   const handleBlockUsers = async () => {
-    const selectedEmails = Object.keys(rowSelection);
-    const result = await blockUsers(selectedEmails);
+    secureAuth();
+    const selectedIds = Object.keys(rowSelection).map(
+      (index) => users[parseInt(index)].id
+    );
+    const result = await blockUsers(selectedIds);
     if (result.success) {
       setReload((prev) => !prev);
-      setErrorMessage(null);
+      setRowSelection({}); // Clear selection
     } else {
-      setErrorMessage(result.error);
+      console.log(result.error);
     }
   };
 
   const handleUnblockUsers = async () => {
-    const selectedEmails = Object.keys(rowSelection);
-    const result = await unblockUsers(selectedEmails);
+    secureAuth();
+    const selectedIds = Object.keys(rowSelection).map(
+      (index) => users[parseInt(index)].id
+    );
+    const result = await unblockUsers(selectedIds);
     if (result.success) {
       setReload((prev) => !prev);
-      setErrorMessage(null);
+      setRowSelection({});
     } else {
-      setErrorMessage(result.error);
+      console.log(result.error);
     }
   };
 
   const handleDeleteUsers = async () => {
-    const selectedEmails = Object.keys(rowSelection);
-    const result = await deleteUsers(selectedEmails);
+    secureAuth();
+    const selectedIds = Object.keys(rowSelection).map(
+      (index) => users[parseInt(index)].id
+    );
+    const result = await deleteUsers(selectedIds);
     if (result.success) {
       setReload((prev) => !prev);
-      setErrorMessage(null);
+      setRowSelection({});
     } else {
-      setErrorMessage(result.error);
+      console.log(result.error);
     }
   };
-
-  useEffect(() => {
-    if (errorMessage) {
-      const timer = setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorMessage]);
 
   // Define columns for TanStack Table
   const columns = useMemo(
@@ -140,6 +141,7 @@ const UsersTable = () => {
       // checkbox
       {
         id: "select",
+
         header: ({ table }) => (
           <div className="flex items-center justify-center h-4 w-4">
             <Checkbox
@@ -154,20 +156,12 @@ const UsersTable = () => {
             />
           </div>
         ),
+
         cell: ({ row }) => (
           <div className="flex items-center justify-center h-4 w-4">
             <Checkbox
-              checked={!!rowSelection[row.original.email]} // Use email as key
-              onCheckedChange={(value) => {
-                setRowSelection((prev) => {
-                  if (value) {
-                    return { ...prev, [row.original.email]: true }; // Add email to selection
-                  } else {
-                    const { [row.original.email]: _, ...rest } = prev; // Remove email from selection
-                    return rest;
-                  }
-                });
-              }}
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
               aria-label="Select row"
             />
           </div>
@@ -308,7 +302,7 @@ const UsersTable = () => {
         enableSorting: true,
       },
     ],
-    [rowSelection]
+    []
   );
 
   // Filter data based on status
@@ -324,33 +318,26 @@ const UsersTable = () => {
     state: {
       rowSelection,
       globalFilter,
-      pagination,
     },
-    pageCount: Math.ceil(totalCount / pagination.pageSize),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
     globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 20,
+      },
+    },
     getSortedRowModel: getSortedRowModel(),
-    manualPagination: true, // Using SQL query for pagination
     enableSorting: true,
   });
 
   return (
     <div className="space-y-4">
-      {errorMessage && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Error!</strong>
-          <span className="block sm:inline">{errorMessage}</span>
-        </div>
-      )}
       {/* Toolbar */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex items-center space-x-2">
