@@ -51,7 +51,7 @@ import {
 } from "@/app/actions/userActions";
 import { checkUserStatus } from "@/app/actions/checkUserStatus";
 import { signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -60,13 +60,15 @@ const UsersTable = () => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [reload, setReload] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const router = useRouter();
 
   // Check Func before Block/Unblock/Delete
   const secureAuth = async () => {
     const status = await checkUserStatus();
     if (status.status === "blocked" || status.status === "userNotFound") {
       signOut();
-      redirect("/page/login");
+      router.push("/page/login");
+      return;
     }
   };
 
